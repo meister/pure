@@ -198,6 +198,8 @@ prompt_pure_preprompt_render() {
 
 		# redraw prompt (also resets cursor position)
 		zle && zle .reset-prompt
+
+		setopt no_prompt_subst
 	fi
 
 	# store both unexpanded and expanded preprompt for comparison
