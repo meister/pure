@@ -24,6 +24,9 @@
 # \e[2K => clear everything on the current line
 
 
+ICON_NODE='\u2B22' # ⬢
+ICON_BRANCH='\uF126' # 
+
 # turns seconds into human readable time
 # 165392 => 1d 21h 56m 32s
 # https://github.com/sindresorhus/pretty-time-zsh
@@ -95,6 +98,14 @@ prompt_pure_preexec() {
 	prompt_pure_set_title 'ignore-escape' "$PWD:t: $2"
 }
 
+prompt_node_version() {
+	node_path=$(which node)
+	if [ $? -eq 0 ]; then
+		node_version=$(sh -c "$node_path -v")
+		node_version=" $ICON_NODE ${node_version:1} "
+	fi
+}
+
 # string length ignoring ansi escapes
 prompt_pure_string_length_to_var() {
 	local str=$1 var=$2 length
@@ -121,6 +132,8 @@ prompt_pure_preprompt_render() {
 
 	# construct preprompt, beginning with path
 	local preprompt="%F{blue}%~%f"
+	# append node version
+	preprompt+="%F{green}${node_version}%f"
 	# git info
 	preprompt+="%F{$git_color}${vcs_info_msg_0_}${prompt_pure_git_dirty}%f"
 	# git pull/push arrows
@@ -207,6 +220,9 @@ prompt_pure_precmd() {
 
 	# preform async git dirty check and fetch
 	prompt_pure_async_tasks
+
+	# get node version
+	prompt_node_version
 
 	# print the preprompt
 	prompt_pure_preprompt_render "precmd"
@@ -336,7 +352,7 @@ prompt_pure_async_tasks() {
 prompt_pure_check_git_arrows() {
 	setopt localoptions noshwordsplit
 	local arrows left=${1:-0} right=${2:-0}
-
+	echo $right
 	(( right > 0 )) && arrows+=${PURE_GIT_DOWN_ARROW:-⇣}
 	(( left > 0 )) && arrows+=${PURE_GIT_UP_ARROW:-⇡}
 
